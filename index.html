@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Aura Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d0707;
+  --panel:#150b0b;
+  --line:#5a1414;
+  --accent:#ff1a1a;
+  --text:#f1e6e6;
+  --muted:#a58f8f;
+  --font:"Shippori Mincho","Hiragino Mincho ProN","Yu Mincho",Georgia,"Times New Roman",serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{
+  background:
+    radial-gradient(1200px 600px at 85% -10%,rgba(255,26,26,.16),transparent 60%),
+    radial-gradient(900px 500px at -10% 110%,rgba(255,26,26,.10),transparent 60%),
+    var(--bg);
+  color:var(--text);font-family:var(--font);
+  padding:max(28px,env(safe-area-inset-top)) max(24px,env(safe-area-inset-right)) max(40px,env(safe-area-inset-bottom)) max(24px,env(safe-area-inset-left));
+  min-height:100vh;
+}
+.wrap{max-width:1040px;margin:0 auto}
+header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:28px 0 26px;border-bottom:2px solid var(--line)}
+h1{margin:0;font-size:clamp(40px,7vw,76px);line-height:.95;font-weight:800;letter-spacing:.5px;color:var(--accent)}
+.sub{margin:10px 0 0;color:var(--muted);font-size:16px;max-width:46ch;line-height:1.5}
+.mode{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:14px;font-weight:700;cursor:pointer;user-select:none}
+.mode input{position:absolute;opacity:0;width:44px;height:24px;margin:0;cursor:pointer}
+.mode .tk{width:44px;height:24px;border-radius:14px;background:rgba(255,255,255,.12);border:2px solid var(--line);position:relative;flex:0 0 auto;transition:background .15s}
+.mode .tk::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:var(--muted);transition:transform .15s,background .15s}
+.mode input:checked+.tk{background:var(--accent)}
+.mode input:checked+.tk::after{transform:translateX(20px);background:#100}
+.mode input:focus-visible+.tk{outline:2px solid var(--accent);outline-offset:3px}
+.mode{position:relative}
+
+.tools{
+  display:flex;
+  align-items:center;
+  gap:18px;
+  flex-wrap:wrap;
+}
+
+.blankhub{
+  background:transparent;
+  color:var(--accent);
+  border:2px solid var(--line);
+  border-radius:10px;
+  padding:9px 14px;
+  font:inherit;
+  font-size:14px;
+  font-weight:800;
+  cursor:pointer;
+  transition:border-color .15s,background .15s,color .15s;
+}
+
+.blankhub:hover{
+  border-color:var(--accent);
+  background:rgba(255,26,26,.12);
+  color:var(--text);
+}
+
+.blankhub:focus-visible{
+  outline:2px solid var(--accent);
+  outline-offset:3px;
+}
+
+.blankhub[hidden]{
+  display:none;
+}
+
+main{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px;margin-top:30px}
+.card{
+  position:relative;display:flex;flex-direction:column;gap:14px;text-align:left;
+  background:var(--panel);border:2px solid var(--line);border-radius:14px;padding:22px 22px 18px;
+  color:inherit;font:inherit;cursor:pointer;overflow:hidden;
+  transition:border-color .15s,transform .15s,background .15s;
+}
+.card::before{content:"";position:absolute;inset:0 auto 0 0;width:6px;background:var(--h,var(--accent))}
+.card:hover{border-color:var(--h,var(--accent));background:#1b0e0e;transform:translateY(-2px)}
+.card:focus-visible{outline:3px solid var(--h,var(--accent));outline-offset:3px}
+.card:active{transform:translateY(0)}
+.top{display:flex;align-items:center;gap:14px}
+.glyph{
+  flex:0 0 auto;width:54px;height:54px;border-radius:12px;display:grid;place-items:center;
+  font-size:28px;font-weight:800;color:#160505;background:var(--h,var(--accent));
+}
+.card h2{margin:0;font-size:24px;line-height:1.1;font-weight:800}
+.card p{margin:0;color:var(--muted);font-size:15px;line-height:1.55;flex:1}
+.foot{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:14px}
+.open{font-weight:800;color:var(--h,var(--accent))}
+.here{color:var(--muted);text-decoration:underline;text-underline-offset:3px;background:none;border:0;font:inherit;cursor:pointer;padding:4px 2px}
+.here:hover,.here:focus-visible{color:var(--text)}
+.note{margin:28px 0 0;color:var(--muted);font-size:14px;line-height:1.6;max-width:70ch}
+#msg{margin-top:18px;min-height:22px;color:var(--accent);font-size:14px;font-weight:700}
+@media (prefers-reduced-motion:reduce){.card,.mode .tk,.mode .tk::after{transition:none}.card:hover{transform:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Aura Hub</h1>
+      <p class="sub">Everything in one place. Each app opens in its own about:blank tab.</p>
+    </div>
+    <div class="tools">
+      <button type="button" class="blankhub" id="hubBlank" title="Open this hub itself inside an about:blank tab">
+        Open this tab in about:blank
+      </button>
+
+      <label class="mode" title="Turn off to open apps in this tab instead of about:blank">
+        <input type="checkbox" id="blankMode" checked>
+        <span class="tk"></span>
+        <span>Open in about:blank</span>
+      </label>
+    </div>
+  </header>
+
+  <main id="grid" aria-label="Apps"></main>
+  <div id="msg" role="status" aria-live="polite"></div>
+  <p class="note">The page files have to sit in the same folder as this one. To add an app, put its file next to this one and add the file name to the <code>FILES</code> list in this page. Parentheses and numbers are stripped from file names when the tile name is made.</p>
+</div>
+
+<script>
+/* File names, in the order the tiles are shown. Keep names free of "(", ")" and numbers. */
+const FILES = [
+  'aura-chat.html',
+  'Aura_Files.html',
+  'Aura_Studio.html',
+  'Aura_Music.html',
+  'Aura_Codex.html'
+];
+
+/* Optional text and color per app, matched by the cleaned name. */
+const INFO = {
+  'aura chat':   {text:'Chat with your community: servers, DMs, calls, shop and profiles.',        hue:'#ff1a1a'},
+  'aura files':  {text:'The game hub. Your games, themes, music and stats in one library.',        hue:'#ff5a2a'},
+  'aura studio': {text:'Customization Studio. Build and share themes, effects and layouts.',       hue:'#ff3d7f'},
+  'aura music':  {text:'The music player with playlists, lyrics and custom banners.',              hue:'#ff9a1f'},
+  'aura codex':  {text:'A private, offline knowledge board for notes, code, guides and images.',   hue:'#d94dff'}
+};
+
+/* Remove ( ), every digit and the .html ending, then tidy what is left into a readable name. */
+function cleanName(file){
+  return file
+    .replace(/\.[a-z0-9]+$/i,'')
+    .replace(/[()]/g,'')
+    .replace(/[0-9]/g,'')
+    .replace(/[_\-]+/g,' ')
+    .replace(/\s+/g,' ')
+    .trim();
+}
+function titleCase(s){return s.replace(/\b\w/g,c=>c.toUpperCase());}
+/* The same cleanup for the file name itself, so names with ( ) or numbers still work if one slips in. */
+function cleanFile(file){
+  const m=file.match(/^(.*?)(\.[a-z0-9]+)?$/i);
+  const base=m[1].replace(/[()]/g,'').replace(/[0-9]/g,'').replace(/[_\-]{2,}/g,'_').replace(/^[_\-]+|[_\-]+$/g,'');
+  return base+(m[2]||'');
+}
+
+const grid=document.getElementById('grid');
+const msg=document.getElementById('msg');
+const modeBox=document.getElementById('blankMode');
+
+try{modeBox.checked=localStorage.getItem('aura_hub_blank')!=='0';}catch(e){}
+modeBox.addEventListener('change',()=>{try{localStorage.setItem('aura_hub_blank',modeBox.checked?'1':'0');}catch(e){}});
+
+const APPS=FILES.map(f=>{
+  const key=cleanName(f).toLowerCase();
+  const info=INFO[key]||{text:'Open '+titleCase(cleanName(f))+'.',hue:'#ff1a1a'};
+  return {file:cleanFile(f),name:titleCase(cleanName(f)),text:info.text,hue:info.hue};
+});
+
+/* document.baseURI is the real page address, even when this hub is running inside a blank tab. */
+function absUrl(file){
+  return new URL(encodeURIComponent(file),document.baseURI).href;
+}
+
+/* Writes a page into a blank tab. A base tag keeps its relative links pointing at the real folder. */
+async function loadInto(w,url,title){
+  const res = await fetch(url,{cache:'no-cache'});
+
+  if(!res.ok){
+    throw new Error('HTTP '+res.status);
+  }
+
+  const html = await res.text();
+  const base = '<base href="'+url+'">';
+  const hasHead = /<head[^>]*>/i.test(html);
+
+  const out = hasHead
+    ? html.replace(/<head[^>]*>/i,m=>m+base)
+    : base+html;
+
+  w.document.open();
+  w.document.write(out);
+  w.document.close();
+}
+
+/* Fallback if fetch is blocked: show the page in a full-screen frame instead. */
+function iframeInto(w,url,title){
+  try{
+    const d = w.document;
+    d.title = title;
+    d.body.style.cssText = 'margin:0;background:#000;overflow:hidden';
+
+    const f = d.createElement('iframe');
+    f.src = url;
+    f.title = title;
+    f.allow = 'fullscreen; autoplay; clipboard-read; clipboard-write; microphone; camera; display-capture; encrypted-media';
+    f.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;border:0;background:#000';
+
+    d.body.appendChild(f);
+  }catch(e){
+    try{
+      w.close();
+    }catch(_){}
+
+    msg.textContent = 'Could not open about:blank here. Opening '+title+' in this tab instead.';
+    location.href = url;
+  }
+}
+
+function openBlank(app){
+  const url = absUrl(app.file);
+  const w = window.open('about:blank','_blank');
+
+  if(!w){
+    msg.textContent = 'Pop-up blocked. Allow pop-ups for this page, then try again.';
+    return;
+  }
+
+  msg.textContent = '';
+
+  loadInto(w,url,app.name).catch(()=>{
+    iframeInto(w,url,app.name);
+  });
+}
+function openHere(app){location.href=absUrl(app.file);}
+function launch(app){modeBox.checked?openBlank(app):openHere(app);}
+
+/* Opens this hub page itself inside an about:blank tab. */
+const hubBtn = document.getElementById('hubBlank');
+
+function openHubBlank(){
+  const url = document.baseURI;
+  const w = window.open('about:blank','_blank');
+
+  if(!w){
+    msg.textContent = 'Pop-up blocked. Allow pop-ups for this page, then try again.';
+    return;
+  }
+
+  msg.textContent = '';
+
+  loadInto(w,url,'Aura Hub').catch(()=>{
+    iframeInto(w,url,'Aura Hub');
+  });
+}
+
+hubBtn.addEventListener('click',openHubBlank);
+
+APPS.forEach(app=>{
+  const card=document.createElement('div');
+  card.className='card';
+  card.tabIndex=0;
+  card.setAttribute('role','button');
+  card.setAttribute('aria-label','Open '+app.name);
+  card.style.setProperty('--h',app.hue);
+  card.innerHTML='<div class="top"><div class="glyph" aria-hidden="true"></div><h2></h2></div><p></p><div class="foot"><span class="open">Open</span><button type="button" class="here">Open in this tab</button></div>';
+  card.querySelector('.glyph').textContent=app.name.charAt(app.name.indexOf(' ')+1)||app.name.charAt(0);
+  card.querySelector('h2').textContent=app.name;
+  card.querySelector('p').textContent=app.text;
+  card.addEventListener('click',e=>{if(e.target.closest('.here'))return;launch(app);});
+  card.addEventListener('keydown',e=>{if(e.target!==card)return;if(e.key==='Enter'||e.key===' '){e.preventDefault();launch(app);}});
+  card.querySelector('.here').addEventListener('click',e=>{e.stopPropagation();openHere(app);});
+  grid.appendChild(card);
+});
+</script>
+</body>
+</html>
